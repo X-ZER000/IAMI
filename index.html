@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IAMI - The mirror of the absurd in this unworthy world.</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: radial-gradient(circle at center, #141414 0%, #070707 100%);
+            color: #ffffff; /* Pure white text */
+            font-family: 'Courier New', Courier, monospace;
+            position: relative;
+        }
+        /* Background scanlines style */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 6px 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .bg-dark-custom {
+            background-color: rgba(20, 20, 20, 0.85);
+            border: 1px solid #444;
+            backdrop-filter: blur(5px);
+        }
+        .form-select {
+            white-space: normal;
+            word-wrap: break-word;
+            font-size: 13px;
+        }
+        /* Mirror Canvas */
+        #canvas-espejo {
+            position: relative;
+            width: 100%;
+            height: 520px;
+            background-color: #0f0f0f;
+            border: 1px dashed #777;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 0 20px #000;
+        }
+        /* 3 Shapes aligned on a perfectly centered vertical axis */
+        .avatar-forma {
+            width: 75px;
+            height: 75px;
+            background-color: #555;
+            margin: 15px 0;
+            transition: all 0.9s cubic-bezier(0.19, 1, 0.22, 1);
+            opacity: 0.75;
+            z-index: 2;
+        }
+        #forma1 { border-radius: 50%; }
+        #forma2 { border-radius: 0%; }
+        #forma3 { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+
+        /* Floating black text blocks */
+        .frase-flotante {
+            position: absolute;
+            background-color: #000;
+            color: #ff3b3b;
+            border: 1px solid #770000;
+            padding: 6px 10px;
+            font-size: 11px;
+            font-weight: bold;
+            z-index: 10;
+            max-width: 150px;
+            text-align: center;
+            box-shadow: 3px 3px 0px #111;
+            animation: flotar 4s ease-in-out infinite alternate;
+        }
+        @keyframes flotar {
+            0% { transform: translateY(0px) rotate(-1deg); }
+            100% { transform: translateY(-10px) rotate(1deg); }
+        }
+        /* Logo styling */
+        .logo-header {
+            max-width: 180px;
+            height: auto;
+            filter: drop-shadow(0px 0px 8px rgba(255, 0, 0, 0.4));
+        }
+        /* Ultra-light gray for labels */
+        .text-light-custom {
+            color: #f0f0f0 !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container my-4">
+    <div class="text-center mb-4">
+        <img src="logo_Indigno.png" alt="IAMI Logo" class="logo-header mb-2" onerror="this.style.display='none';">
+        <h1 class="display-6 fw-bold text-danger mb-0">I.A.M.I.</h1>
+        <p class="small text-light-custom text-uppercase tracking-widest">The mirror of the absurd in this unworthy world.</p>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="p-4 rounded bg-dark-custom">
+                <h3 class="h6 mb-3 text-warning text-uppercase">// Fragments of Consciousness</h3>
+                
+                <div class="mb-3">
+                    <label class="form-label small text-light-custom">1. The echo of your social laughter distorts when:</label>
+                    <select id="p1" class="form-select bg-dark text-light border-secondary">
+                        <option value="A">The silence of others exposes my performance.</option>
+                        <option value="B">I catch myself imitating my own persona mechanically.</option>
+                        <option value="C">I realize that laughing is the only language they have left.</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small text-light-custom">2. Within the architecture of this void, you position yourself as:</label>
+                    <select id="p2" onchange="verificarSeguimiento()" class="form-select bg-dark text-light border-secondary">
+                        <option value="A">A static shadow documenting the absolute collapse.</option>
+                        <option value="B">A prey fully aware of the strings that pull it forward.</option>
+                        <option value="C">A hunter concealing its fractures behind an imposing mantle.</option>
+                    </select>
+                </div>
+                <div id="sub-p2" class="mb-3 d-none"></div>
+
+                <div class="mb-3">
+                    <label class="form-label small text-light-custom">3. When mutating your inner perspective, the deepest abyss is:</label>
+                    <select id="p3" class="form-select bg-dark text-light border-secondary">
+                        <option value="A">Accepting the innate resilience of my own living matter.</option>
+                        <option value="B">Becoming the executioner of my original desires.</option>
+                        <option value="C">Discovering that my existence plays out as irrelevant text.</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small text-light-custom">4. Facing the constant flow of water and vastness, you perceive:</label>
+                    <select id="p4" onchange="verificarSeguimiento()" class="form-select bg-dark text-light border-secondary">
+                        <option value="A">A peaceful assimilation; I belong to this chaotic order.</option>
+                        <option value="B">A geometric panic before my absolute physical insignificance.</option>
+                        <option value="C">The cold indifference of a nature that does not recognize me.</option>
+                    </select>
+                </div>
+                <div id="sub-p4" class="mb-3 d-none"></div>
+
+                <div class="mb-3">
+                    <label class="form-label small text-light-custom">5. When the contours of external faces fade away into darkness:</label>
+                    <select id="p5" class="form-select bg-dark text-light border-secondary">
+                        <option value="A">I navigate the codes of identity without any friction.</option>
+                        <option value="B">Features blur into an untranslatable, heavy smear.</option>
+                        <option value="C">I acknowledge that I only see masks reflecting my own face.</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small text-light-custom">6. The human urgency to structure sound and art stems from:</label>
+                    <select id="p6" class="form-select bg-dark text-light border-secondary">
+                        <option value="A">A pulse of pure empathy meant to break the isolation.</option>
+                        <option value="B">A desperate scream to temporarily suspend oblivion.</option>
+                        <option value="C">A simple attempt to camouflage the stillness of the surrounding environment.</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small text-light-custom">7. When tracing the symmetry of your two opposing halves:</label>
+                    <select id="p7" onchange="verificarSeguimiento()" class="form-select bg-dark text-light border-secondary">
+                        <option value="A">I reconcile the particles in a dynamic, imperfect balance.</option>
+                        <option value="B">I fluctuate eternally between omnipotence and absolute collapse.</option>
+                        <option value="C">I choose to ignore the half that threatens to dismantle the whole.</option>
+                    </select>
+                </div>
+                <div id="sub-p7" class="mb-4 d-none"></div>
+
+                <button onclick="interpretarMascara()" class="btn btn-outline-danger w-100 fw-bold py-2 text-uppercase tracking-wider">Deconstruct Identity</button>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="p-4 rounded bg-dark-custom text-center h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <h3 class="h6 mb-3 text-info text-uppercase">// Mirror of Decomposition</h3>
+                    <div id="canvas-espejo" class="mb-3">
+                        <div id="forma1" class="avatar-forma"></div>
+                        <div id="forma2" class="avatar-forma"></div>
+                        <div id="forma3" class="avatar-forma"></div>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-black text-start rounded border border-secondary">
+                    <small class="text-light-custom d-block" style="font-size: 10px; letter-spacing: 1px;">MASK METRIC PROFILE:</small>
+                    <span id="perfil-codigo" class="text-success fw-bold small">AWAITING CONSCIOUSNESS DATA...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function verificarSeguimiento() {
+    const p2 = document.getElementById('p2').value;
+    const sub2 = document.getElementById('sub-p2');
+    if (p2 === 'C') {
+        sub2.innerHTML = `<label class="form-label text-danger small">// Is the internal fracture visible against the light?</label>
+            <select id="p2_cond" class="form-select bg-dark text-danger border-danger small"><option value="si">Yes, the disguise is fragile.</option><option value="no">No, the armor is seamless.</option><option value="talvez">I choose not to look down.</option></select>`;
+        sub2.classList.remove('d-none');
+    } else { sub2.classList.add('d-none'); }
+
+    const p4 = document.getElementById('p4').value;
+    const sub4 = document.getElementById('sub-p4');
+    if (p4 === 'B') {
+        sub4.innerHTML = `<label class="form-label text-danger small">// Does that zero scale cancel out your will?</label>
+            <select id="p4_cond" class="form-select bg-dark text-danger border-danger small"><option value="vacio">It dissolves me entirely.</option><option value="libertad">It grants me a fertile void.</option><option value="neutral">It is an indifferent mathematical data.</option></select>`;
+        sub4.classList.remove('d-none');
+    } else { sub4.classList.add('d-none'); }
+
+    const p7 = document.getElementById('p7').value;
+    const sub7 = document.getElementById('sub-p7');
+    if (p7 === 'B') {
+        sub7.innerHTML = `<label class="form-label text-danger small">// Which vector do you inhabit at this precise moment?</label>
+            <select id="p7_cond" class="form-select bg-dark text-danger border-danger small"><option value="arriba">At the peak of the delusion.</option><option value="abajo">In the inertia of the descent.</option><option value="medio">In the static balance of the pendulum.</option></select>`;
+        sub7.classList.remove('d-none');
+    } else { sub7.classList.add('d-none'); }
+}
+
+function interpretarMascara() {
+    const p1 = document.getElementById('p1').value;
+    const p2 = document.getElementById('p2').value;
+    const p3 = document.getElementById('p3').value;
+    const p4 = document.getElementById('p4').value;
+    const p5 = document.getElementById('p5').value;
+    const p6 = document.getElementById('p6').value;
+    const p7 = document.getElementById('p7').value;
+
+    const f1 = document.getElementById('forma1');
+    const f2 = document.getElementById('forma2');
+    const f3 = document.getElementById('forma3');
+    const canvas = document.getElementById('canvas-espejo');
+    const codigoText = document.getElementById('perfil-codigo');
+
+    document.querySelectorAll('.frase-flotante').forEach(f => f.remove());
+
+    let frases = [];
+    let codigo = "IAMI-";
+
+    // Shape 1 Reaction (Circle)
+    if (p1 === "B" || p5 === "B") {
+        f1.style.transform = "scaleX(1.9) scaleY(0.4)"; 
+        f1.style.backgroundColor = "#d92027"; 
+        frases.push("BLURRED FEATURES", "AUTOMATIC PERFORMANCE");
+        codigo += "FRACT-";
+    } else if (p1 === "C") {
+        f1.style.transform = "scaleX(0.5) scaleY(1.6)";
+        f1.style.backgroundColor = "#ff7b00";
+        frases.push("SOLE LANGUAGE");
+        codigo += "MUT-";
+    } else {
+        f1.style.transform = "scale(0.85)";
+        f1.style.backgroundColor = "#35baf6";
+        frases.push("SOCIAL CODE");
+        codigo += "NORM-";
+    }
+
+    // Shape 2 Reaction (Square)
+    if (p2 === "B") {
+        f2.style.transform = "scaleX(0.3) scaleY(1.8)";
+        f2.style.backgroundColor = "#ffcd3c";
+        frases.push("VISIBLE STRINGS");
+    } else if (p2 === "C") {
+        f2.style.transform = "scaleX(1.7) scaleY(1.1)";
+        f2.style.backgroundColor = "#6a097d";
+        frases.push("IMPOSING MANTLE");
+    } else {
+        f2.style.transform = "scale(0.95)";
+        f2.style.backgroundColor = "#00b4d8";
+        frases.push("STATIC SHADOW");
+    }
+
+    // Shape 3 Reaction (Triangle)
+    if (p3 === "C" || p4 === "B") {
+        f3.style.transform = "scaleY(2.4) scaleX(0.4)";
+        f3.style.opacity = "0.25";
+        frases.push("GEOMETRIC PANIC", "IRRELEVANT TEXT");
+        codigo += "UNWORTHY";
+    } else if (p3 === "A" || p6 === "A") {
+        f3.style.transform = "scale(1.2)";
+        f3.style.opacity = "0.9";
+        f3.style.backgroundColor = "#ff0055";
+        frases.push("LIVING MATTER", "EMPATHY PULSE");
+        codigo += "ABSURD";
+    } else {
+        f3.style.transform = "scaleX(1) scaleY(1)";
+        f3.style.opacity = "0.6";
+        f3.style.backgroundColor = "#222";
+        frases.push("COLD INDIFFERENCE");
+        codigo += "VOID";
+    }
+
+    const p7Cond = document.getElementById('p7_cond');
+    if (p7Cond) {
+        if (p7Cond.value === 'arriba') frases.push("PEAK OF DELUSION");
+        if (p7Cond.value === 'abajo') frases.push("INERTIA OF DESCENT");
+    }
+
+    codigoText.innerText = `${codigo} // ANATOMY VERIFIED.`;
+
+    // Coordinates grid to avoid text overlapping on display
+    const zonas = [
+        {left: '6%', top: '8%'},   {left: '68%', top: '12%'},
+        {left: '10%', top: '82%'}, {left: '65%', top: '78%'},
+        {left: '5%', top: '46%'},  {left: '70%', top: '44%'}
+    ];
+
+    frases.forEach((texto, i) => {
+        if (i < zonas.length) {
+            const cuadro = document.createElement('div');
+            cuadro.className = 'frase-flotante';
+            cuadro.innerText = texto;
+            cuadro.style.left = zonas[i].left;
+            cuadro.style.top = zonas[i].top;
+            cuadro.style.animationDelay = `${i * 0.3}s`;
+            canvas.appendChild(cuadro);
+        }
+    });
+}
+</script>
+</body>
+</html>
